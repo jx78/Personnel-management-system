@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/css/style.css">
+    <title>Empleados Finalizados - Sistema de Evaluación</title>
+</head>
+
+<body>
+    <!-- Barra de navegación uniforme -->
+    <header class="navbar">
+        <div class="navbar-inner">
+            <div class="navbar-brand">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                <span>Gestión de Personal</span>
+                <span class="navbar-brand-badge">Sistema</span>
+            </div>
+            <!-- Barra de navegación con enlaces pre-renderizados -->
+            <nav id="links" class="links">
+                <a class="nav-link" href="/public/html/index.html">
+                    <span>📝</span> Registro
+                </a>
+                <a class="nav-link" href="/public/html/en evaluacion.html">
+                    <span>⏳</span> En Evaluación
+                </a>
+                <a class="nav-link active" href="/public/html/Finalizados.html">
+                    <span>✅</span> Finalizados
+                </a>
+                <a class="nav-link" href="/public/html/No Finalizados.html">
+                    <span>⛔</span> No Finalizados
+                </a>
+                <a class="nav-link btn-logout" id="navBtnLogout" href="javascript:void(0)">
+                    <span>🚪</span> Cerrar Sesión
+                </a>
+                <a class="nav-link nav-link-icon" id="navBtnConfig" href="/public/html/access_config.html" title="Configuraciones del Sistema" aria-label="Configuraciones del Sistema">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page-container">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">✅ Empleados Finalizados</h1>
+                <p class="page-subtitle">
+                    Personal que concluyó satisfactoriamente el período de prueba y cuenta con sus evaluaciones
+                    aprobadas.
+                </p>
+            </div>
+        </div>
+
+        <!-- Filtros de Búsqueda -->
+        <div class="search-card">
+            <form onsubmit="return false;" class="search-form-grid">
+                <div class="form-group">
+                    <label for="codigofinalizados">Código de Empleado:</label>
+                    <input type="text" id="codigofinalizados" name="codigofinalizados" maxlength="20" placeholder="Ej. 00201">
+                </div>
+
+                <div class="form-group">
+                    <label for="nombrefinalizados">Buscar por Nombre o Apellido:</label>
+                    <input type="text" id="nombrefinalizados" name="nombrefinalizados" placeholder="Ej. Ana o Ramos">
+                </div>
+
+                <div class="btn-actions">
+                    <button type="button" id="buscador" class="buscador">🔍 Buscar</button>
+                    <button type="button" id="limpiar" class="limpiar">Limpiar</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Lista de Empleados con Cabecera y Detalle Expandible -->
+        <div class="lista-empleados">
+            <div class="lista-header">
+                <span class="col-codigo">N° Empleado</span>
+                <span class="col-nombre">Nombre</span>
+                <span class="col-apellido">Apellido</span>
+                <span class="col-puesto">Puesto</span>
+                <span class="col-supervisor">Supervisor</span>
+                <span class="col-badge">Estado / Promedio</span>
+                <span class="flecha"></span>
+            </div>
+            <div id="listaFinalizados">
+                <!-- Se rellena dinámicamente con JavaScript -->
+            </div>
+        </div>
+
+        <!-- Contenedor de Paginación -->
+        <div id="paginacion"></div>
+    </main>
+
+    <!-- Scripts centralizados -->
+    <script src="/public/js/script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            inicializarVistaLista({
+                endpoint: '/backend/finalizados.php',
+                tipoVista: 'finalizado',
+                contenedorListaId: 'listaFinalizados',
+                paginacionId: 'paginacion',
+                inputNombreId: 'nombrefinalizados',
+                inputCodigoId: 'codigofinalizados',
+                btnBuscarId: 'buscador',
+                btnLimpiarId: 'limpiar'
+            });
+        });
+    </script>
+</body>
+
+</html>

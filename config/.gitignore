@@ -1,0 +1,64 @@
+# =============================================================
+#  .gitignore — Sistema de Gestión de Empleados (WEB)
+# =============================================================
+
+# ── Bases de datos SQLite y archivos de almacenamiento local ─
+# Los datos mutables de la aplicación residen en %APPDATA%\SistemaEmpleados.
+# Se excluyen bases de datos y archivos dinámicos generados en storage local.
+*.db
+*.sqlite
+*.sqlite3
+/storage/*
+!/storage/.gitkeep
+!/storage/.htaccess
+
+# ── Respaldos locales generados ──────────────────────────────
+respaldos/
+
+# ── PHP portable (binarios de runtime; no van al repositorio) ─
+# Se excluyen los binarios extraídos en php\ pero se versiona README.txt.
+/php/*
+!/php/README.txt
+vc_redist*.exe
+
+# ── Logs y archivos de depuración ────────────────────────────
+*.log
+/logs/
+/cache/
+
+# ── Dependencias externas (si se agregan en el futuro) ────────
+/vendor/
+/node_modules/
+
+# ── Entorno de desarrollo / IDEs y SO ────────────────────────
+.vscode/
+.idea/
+*.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Archivos temporales de edición ───────────────────────────
+*.swp
+*.bak
+*.tmp
+
+# ── Instalador y salidas de compilación ──────────────────────
+/Output/
+*.exe
+!vc_redist*.exe
+
+# ── Archivos esenciales del proyecto (NO ignorados) ───────────
+!router.php
+!iniciar_servidor.ps1
+!iniciar_servidor.bat
+!detener_servidor.bat
+!php.ini
+!diagnostico.bat
+!diagnostico.ps1
+!restablecer_admin.bat
+!restablecer_admin.ps1
+!restablecer_root_mysql.bat
+!restablecer_root_mysql.ps1
+!migrar_a_mysql.php
+!database/
+!database/schema.sql

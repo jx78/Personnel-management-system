@@ -1,0 +1,3 @@
+# Este directorio contiene la base de datos SQLite en entornos de desarrollo.
+# El archivo .db está excluido del repositorio mediante .gitignore.
+# En producción usa MySQL; el archivo .db no debería existir aquí.

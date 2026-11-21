@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/css/style.css">
+    <title>Acceso al Sistema - Gestión de Empleados</title>
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            <div class="auth-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+            </div>
+            <h1 class="auth-title">Control de Evaluaciones</h1>
+            <p class="auth-subtitle">Ingresa la contraseña administrativa para continuar</p>
+
+            <div id="mensajeAlerta" class="alert-box"></div>
+
+            <form id="formAcceso" class="formAcceso" method="POST" action="/backend/login.php">
+                <div class="form-group password-container" style="margin-bottom: 20px;">
+                    <label for="Password">Contraseña de Acceso</label>
+                    <input type="password" id="Password" name="Password" placeholder="••••••" autocomplete="current-password" required autofocus>
+                </div>
+
+                <button type="submit" class="btn-primary" style="width: 100%; padding: 12px;">
+                    Ingresar al Sistema
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/public/js/access.js"></script>
+</body>
+</html>

@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Panel de configuraciones del sistema — cambio de contraseñas y respaldo manual de la base de datos.">
+    <link rel="stylesheet" href="/public/css/style.css">
+    <title>Configuraciones — Gestión de Personal</title>
+    <style>
+        /* ── Variables de color y temas específicos ───────────────── */
+        :root {
+            --warning:        #f59e0b;
+            --warning-bg:     #fffbeb;
+            --warning-border: #fcd34d;
+            --danger:         #dc2626;
+            --danger-bg:      #fef2f2;
+            --danger-border:  #fca5a5;
+            --purple:         #7c3aed;
+            --purple-light:   #f5f3ff;
+            --purple-border:  #ddd6fe;
+        }
+
+        /* ── Cabecera dedicada (sin el menú de páginas del sistema) ── */
+        .config-navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 24px;
+        }
+
+        .config-navbar-inner {
+            max-width: 1040px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .config-navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--text-primary);
+        }
+
+        .config-badge {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-access-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-access-nav:hover {
+            background: var(--bg-surface-subtle);
+            color: var(--text-primary);
+            border-color: #cbd5e1;
+            transform: translateY(-1px);
+        }
+
+        /* ── Layout Grid ───────────────────────────────────────────── */
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            max-width: 1040px;
+            margin: 0 auto;
+        }
+
+        /* ── Tarjetas ──────────────────────────────────────────────── */
+        .config-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: 26px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        .config-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .config-card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .config-card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.3rem;
+        }
+
+        .config-card-icon.blue   { background: var(--primary-light); }
+        .config-card-icon.amber  { background: var(--warning-bg); }
+        .config-card-icon.purple { background: var(--purple-light); }
+
+        .config-card-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+
+        .config-card-desc {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* ── Aviso informativo ─────────────────────────────────────── */
+        .info-notice {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            border-radius: var(--radius-md);
+            padding: 11px 14px;
+            font-size: 0.8125rem;
+            line-height: 1.45;
+        }
+
+        .info-notice.warning {
+            background: var(--warning-bg);
+            border: 1px solid var(--warning-border);
+            color: #92400e;
+        }
+
+        .info-notice.purple {
+            background: var(--purple-light);
+            border: 1px solid var(--purple-border);
+            color: #5b21b6;
+        }
+
+        .info-notice-icon {
+            font-size: 1rem;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        /* ── Caja de Estado del Respaldo ───────────────────────────── */
+        .status-box {
+            background: var(--bg-surface-subtle);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .status-box-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .status-box-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+        }
+
+        .status-badge.available {
+            background: var(--success-bg);
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .status-badge.empty {
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #cbd5e1;
+        }
+
+        .status-badge-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .status-box-content {
+            font-size: 0.925rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .status-box-sub {
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+        }
+
+        /* ── Botonera de Respaldo ──────────────────────────────────── */
+        .backup-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .btn-backup {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            font-size: 0.925rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            border: none;
+        }
+
+        .btn-backup.primary {
+            background: var(--purple);
+            color: #ffffff;
+        }
+
+        .btn-backup.primary:hover:not(:disabled) {
+            background: #6d28d9;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .btn-backup.secondary {
+            background: var(--bg-surface);
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
+        }
+
+        .btn-backup.secondary:hover:not(:disabled) {
+            background: var(--primary-light);
+            transform: translateY(-1px);
+        }
+
+        .btn-backup:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* ── Campos de contraseña y fortaleza ──────────────────────── */
+        .password-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-wrap input {
+            width: 100%;
+            padding-right: 44px;
+        }
+
+        .btn-toggle-pass {
+            position: absolute;
+            right: 8px;
+            background: none;
+            border: none;
+            padding: 6px;
+            cursor: pointer;
+            color: var(--text-muted);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.15s ease;
+        }
+
+        .btn-toggle-pass:hover {
+            color: var(--text-primary);
+        }
+
+        .strength-bar-wrap {
+            height: 4px;
+            background: var(--border-color);
+            border-radius: 2px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+
+        .strength-bar-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 2px;
+            transition: width 0.25s ease, background-color 0.25s ease;
+        }
+
+        .strength-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-top: 3px;
+            min-height: 16px;
+        }
+
+        /* ── Spinner y Alertas ─────────────────────────────────────── */
+        .btn-with-spinner {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .spinner {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        .loading .spinner { display: block; }
+        .loading .btn-label { opacity: 0.75; }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .result-alert {
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+            font-size: 0.8125rem;
+            line-height: 1.4;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .result-alert.success {
+            background: var(--success-bg);
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+        }
+
+        .result-alert.error {
+            background: var(--danger-bg);
+            border: 1px solid var(--danger-border);
+            color: #991b1b;
+        }
+
+        .result-alert.hidden { display: none; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Modal de Confirmación para Respaldo ───────────────────── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-box {
+            background: var(--bg-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            max-width: 440px;
+            width: 100%;
+            padding: 24px;
+            transform: scale(0.95);
+            transition: transform 0.2s ease;
+        }
+
+        .modal-overlay.active .modal-box {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .modal-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--warning-bg);
+            color: var(--warning);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-modal-cancel {
+            padding: 9px 16px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .btn-modal-cancel:hover {
+            background: var(--bg-surface-subtle);
+        }
+
+        .btn-modal-confirm {
+            padding: 9px 18px;
+            border-radius: var(--radius-md);
+            border: none;
+            background: var(--purple);
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .btn-modal-confirm:hover {
+            background: #6d28d9;
+        }
+
+        @media (max-width: 640px) {
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════════════ HEADER MINIMALISTA ═════════════════════════════
+     Acceso directo hacia los registros del sistema ── -->
+<header class="config-navbar">
+    <div class="config-navbar-inner">
+        <div class="config-navbar-brand">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                 style="color: var(--primary);">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            <span>Configuraciones del Sistema</span>
+            <span class="config-badge">Panel Administrativo</span>
+        </div>
+
+        <div>
+            <a href="/public/html/index.html" class="btn-access-nav" title="Volver a los Registros de Empleados">
+                <span>📋</span>
+                <span>Volver a Registros</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- ═══════════════════════ CONTENIDO PRINCIPAL ════════════════════════════ -->
+<main class="page-container" style="max-width: 1040px; margin: 32px auto; padding: 0 20px;">
+    <div class="page-header" style="margin-bottom: 28px;">
+        <h1 class="page-title" style="font-size: 1.6rem; font-weight: 800; color: var(--text-primary); margin-bottom: 6px;">
+            ⚙️ Panel de Configuraciones y Seguridad
+        </h1>
+        <p class="page-subtitle" style="font-size: 0.95rem; color: var(--text-secondary);">
+            Administra la copia de seguridad de la base de datos y las credenciales del sistema.
+        </p>
+    </div>
+
+    <!-- ── BANNER DE ALERTA DE SEGURIDAD POR CLAVES DE FÁBRICA ──────── -->
+    <div id="banner-alerta-claves" class="info-notice warning" style="display: none; margin-bottom: 24px; padding: 14px 18px; border-left: 4px solid var(--warning); border-radius: var(--radius-md);">
+        <span class="info-notice-icon" style="font-size: 1.3rem;">⚠️</span>
+        <div style="flex: 1;">
+            <strong style="color: #92400e; font-size: 0.95rem;">Advertencia de Seguridad: Claves de Fábrica Activas</strong>
+            <p id="txtAlertaClaves" style="margin: 4px 0 0 0; color: #78350f; font-size: 0.85rem;">
+                El sistema tiene configuradas contraseñas predeterminadas de fábrica. Modifícalas de inmediato para evitar accesos no autorizados.
+            </p>
+        </div>
+    </div>
+
+    <div class="config-grid">
+
+        <!-- ── TARJETA 1: RESPALDO MANUAL DE BASE DE DATOS ─────────────── -->
+        <div class="config-card" id="card-respaldo">
+            <div class="config-card-header">
+                <div class="config-card-icon purple">💾</div>
+                <div>
+                    <div class="config-card-title">Respaldo de Base de Datos</div>
+                    <div class="config-card-desc">Copia de seguridad manual de empleados, evaluaciones y usuarios.</div>
+                </div>
+            </div>
+
+            <div class="info-notice purple">
+                <span class="info-notice-icon">ℹ️</span>
+                <div>
+                    <strong>Regla de respaldo:</strong> El sistema conserva un solo respaldo (el más reciente). Cada nuevo respaldo reemplaza al anterior.
+                </div>
+            </div>
+
+            <!-- Caja de Estado del Último Respaldo -->
+            <div class="status-box" id="statusBoxRespaldo">
+                <div class="status-box-header">
+                    <span class="status-box-title">Estado del último respaldo</span>
+                    <span class="status-badge empty" id="badgeRespaldo">
+                        <span class="status-badge-dot"></span>
+                        <span id="badgeTexto">Consultando...</span>
+                    </span>
+                </div>
+                <div class="status-box-content" id="txtRespaldoInfo">
+                    Cargando información...
+                </div>
+                <div class="status-box-sub" id="txtRespaldoSub">
+                    Comprobando archivo en el servidor...
+                </div>
+            </div>
+
+            <div id="msg-respaldo" class="result-alert hidden"></div>
+
+            <!-- Botones de Acción de Respaldo -->
+            <div class="backup-actions">
+                <button type="button" id="btnCrearRespaldo" class="btn-backup primary btn-with-spinner">
+                    <div class="spinner"></div>
+                    <span class="btn-label">💾 Crear respaldo</span>
+                </button>
+
+                <a id="btnDescargarRespaldo" href="/backend/descargar_respaldo.php" class="btn-backup secondary" style="display: none;">
+                    <span>⬇️ Descargar respaldo</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- ── TARJETA: COPIA AUTOMÁTICA EXTERNA (USB O NUBE) ─────────── -->
+        <div class="config-card" id="card-copia-externa">
+            <div class="config-card-header">
+                <div class="config-card-icon blue">☁️</div>
+                <div>
+                    <div class="config-card-title">Copia Externa Automática</div>
+                    <div class="config-card-desc">Guarda una copia adicional en una memoria USB o nube cada vez que respaldos.</div>
+                </div>
+            </div>
+
+            <div class="info-notice blue" style="background: var(--primary-light); border: 1px solid #bfdbfe; color: #1e40af;">
+                <span class="info-notice-icon">🛡️</span>
+                <div>
+                    <strong>Protección ante fallas:</strong> Si la computadora se daña, tus datos estarán a salvo en tu almacenamiento externo.
+                </div>
+            </div>
+
+            <form id="form-copia-externa" autocomplete="off" novalidate>
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 600; color: var(--text-primary); font-size: 0.875rem;">
+                        <input type="checkbox" id="chkCopiaExterna" name="habilitada" value="1" style="width: 18px; height: 18px; cursor: pointer;">
+                        <span>Activar copia automática al respaldar</span>
+                    </label>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label class="form-label" for="txtRutaExterna">Ruta de carpeta de destino (USB o Nube)</label>
+                    <input type="text" id="txtRutaExterna" name="ruta_destino"
+                           placeholder="Ej. E:\RespaldosSistema o D:\Dropbox\Respaldos"
+                           style="width: 100%; padding: 9px 12px; font-size: 0.875rem;" required>
+                    <small style="color: var(--text-muted); font-size: 0.75rem; display: block; margin-top: 4px;">
+                        Ruta absoluta donde se copiará el archivo .sql con fecha y hora.
+                    </small>
+                </div>
+
+                <div class="status-box" id="boxCopiaExterna" style="margin-bottom: 12px;">
+                    <div class="status-box-header">
+                        <span class="status-box-title">Estado de carpeta externa</span>
+                        <span class="status-badge empty" id="badgeCopiaExterna">
+                            <span class="status-badge-dot"></span>
+                            <span id="txtBadgeCopia">No configurada</span>
+                        </span>
+                    </div>
+                    <div id="txtCopiaExternaInfo" class="status-box-content" style="font-size: 0.85rem;">
+                        Consultando...
+                    </div>
+                    <div id="txtCopiaExternaSub" class="status-box-sub"></div>
+                </div>
+
+                <div id="msg-copia-externa" class="result-alert hidden"></div>
+
+                <button type="submit" id="btnGuardarCopiaExterna" class="btn-primary btn-with-spinner" style="width: 100%; padding: 10px; margin-top: 4px;">
+                    <div class="spinner"></div>
+                    <span class="btn-label">Guardar configuración externa</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- ── TARJETA: RESTAURACIÓN DE BASE DE DATOS ──────────────────── -->
+        <div class="config-card" id="card-restaurar">
+            <div class="config-card-header">
+                <div class="config-card-icon amber">🔄</div>
+                <div>
+                    <div class="config-card-title">Restaurar Base de Datos</div>
+                    <div class="config-card-desc">Recupera los datos del sistema desde el último respaldo o desde un archivo SQL.</div>
+                </div>
+            </div>
+
+            <div class="info-notice warning">
+                <span class="info-notice-icon">⚠️</span>
+                <div>
+                    <strong>Copia preventiva:</strong> El sistema genera automáticamente un respaldo temporal de tus datos actuales antes de restaurar.
+                </div>
+            </div>
+
+            <div class="backup-actions" style="gap: 12px;">
+                <button type="button" id="btnRestaurarUltimo" class="btn-backup secondary btn-with-spinner" style="width: 100%; justify-content: center;">
+                    <div class="spinner"></div>
+                    <span class="btn-label">↺ Restaurar desde último respaldo</span>
+                </button>
+
+                <div style="border-top: 1px dashed var(--border-color); margin: 4px 0;"></div>
+
+                <div>
+                    <label class="form-label" style="margin-bottom: 6px; display: block;">O restaurar desde archivo externo (.sql):</label>
+                    <input type="file" id="inputArchivoSql" accept=".sql" style="display: none;">
+                    <button type="button" id="btnSeleccionarArchivoSql" class="btn-backup primary" style="width: 100%; justify-content: center; background: #0284c7;">
+                        <span>📁 Cargar archivo .sql externo...</span>
+                    </button>
+                    <div id="txtArchivoSeleccionado" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px; word-break: break-all;"></div>
+                </div>
+            </div>
+
+            <div id="msg-restaurar" class="result-alert hidden"></div>
+        </div>
+
+        <!-- ── TARJETA 2: CONTRASEÑA DE ACCESO AL REGISTRO ──────────────── -->
+        <div class="config-card" id="card-acceso">
+            <div class="config-card-header">
+                <div class="config-card-icon blue">🔑</div>
+                <div>
+                    <div class="config-card-title">Contraseña de Acceso al Sistema</div>
+                    <div class="config-card-desc">Clave requerida en la pantalla de inicio de sesión (usuario admin).</div>
+                </div>
+            </div>
+
+            <div class="info-notice warning">
+                <span class="info-notice-icon">⚠️</span>
+                <div>
+                    <strong>Predeterminada:</strong> <code>ana2</code>. Cámbiala por una clave que recuerdes bien.
+                </div>
+            </div>
+
+            <form id="form-acceso" autocomplete="off" novalidate>
+                <input type="hidden" name="tipo" value="acceso">
+
+                <div class="form-group" style="margin-bottom:14px;">
+                    <label class="form-label" for="acc-actual">Contraseña actual</label>
+                    <div class="password-wrap">
+                        <input type="password" id="acc-actual" name="pass_actual"
+                               placeholder="Contraseña actual" autocomplete="current-password" required>
+                        <button type="button" class="btn-toggle-pass" aria-label="Mostrar/ocultar" onclick="togglePass('acc-actual', this)">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom:8px;">
+                    <label class="form-label" for="acc-nueva">Nueva contraseña de acceso</label>
+                    <div class="password-wrap">
+                        <input type="password" id="acc-nueva" name="pass_nueva"
+                               placeholder="Mínimo 6 caracteres" autocomplete="new-password"
+                               oninput="evaluarFortaleza(this, 'sb-acc', 'sl-acc')" required>
+                        <button type="button" class="btn-toggle-pass" aria-label="Mostrar/ocultar" onclick="togglePass('acc-nueva', this)">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="strength-bar-wrap">
+                        <div class="strength-bar-fill" id="sb-acc"></div>
+                    </div>
+                    <div class="strength-label" id="sl-acc"></div>
+                </div>
+
+                <div class="form-group" style="margin-bottom:18px;">
+                    <label class="form-label" for="acc-confirm">Confirmar nueva contraseña</label>
+                    <div class="password-wrap">
+                        <input type="password" id="acc-confirm" name="pass_confirmacion"
+                               placeholder="Repite la nueva contraseña" autocomplete="new-password" required>
+                        <button type="button" class="btn-toggle-pass" aria-label="Mostrar/ocultar" onclick="togglePass('acc-confirm', this)">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="msg-acceso" class="result-alert hidden"></div>
+
+                <button type="submit" id="btn-acceso" class="btn-primary btn-with-spinner" style="width:100%; padding:11px; margin-top: 4px;">
+                    <div class="spinner"></div>
+                    <span class="btn-label">Actualizar contraseña de acceso</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- ── TARJETA 3: CONTRASEÑA DE ACCESO A CONFIGURACIONES ────────── -->
+        <div class="config-card" id="card-config-pass">
+            <div class="config-card-header">
+                <div class="config-card-icon blue">⚙️</div>
+                <div>
+                    <div class="config-card-title">Contraseña de Acceso a Configuraciones</div>
+                    <div class="config-card-desc">Clave requerida para ingresar a este panel de administración.</div>
+                </div>
+            </div>
+
+            <div class="info-notice warning">
+                <span class="info-notice-icon">⚠️</span>
+                <div>
+                    <strong>Predeterminada:</strong> <code>ana3</code>. Clave para entrar a esta sección de configuración.
+                </div>
+            </div>
+
+            <form id="form-config-pass" autocomplete="off" novalidate>
+                <input type="hidden" name="tipo" value="configuracion">
+
+                <div class="form-group" style="margin-bottom:14px;">
+                    <label class="form-label" for="cfg-actual">Contraseña actual</label>
+                    <div class="password-wrap">
+                        <input type="password" id="cfg-actual" name="pass_actual"
+                               placeholder="Contraseña actual de configuración" autocomplete="current-password" required>
+                        <button type="button" class="btn-toggle-pass" aria-label="Mostrar/ocultar" onclick="togglePass('cfg-actual', this)">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom:8px;">
+                    <label class="form-label" for="cfg-nueva">Nueva contraseña de configuración</label>
+                    <div class="password-wrap">
+                        <input type="password" id="cfg-nueva" name="pass_nueva"
+                               placeholder="Mínimo 6 caracteres" autocomplete="new-password"
+                               oninput="evaluarFortaleza(this, 'sb-cfg', 'sl-cfg')" required>
+                        <button type="button" class="btn-toggle-pass" aria-label="Mostrar/ocultar" onclick="togglePass('cfg-nueva', this)">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="strength-bar-wrap">
+                        <div class="strength-bar-fill" id="sb-cfg"></div>
+                    </div>
+                    <div class="strength-label" id="sl-cfg"></div>
+                </div>
+
+                <div class="form-group" style="margin-bottom:18px;">
+                    <label class="form-label" for="cfg-confirm">Confirmar nueva contraseña</label>
+                    <div class="password-wrap">
+                        <input type="password" id="cfg-confirm" name="pass_confirmacion"
+                               placeholder="Repite la nueva contraseña" autocomplete="new-password" required>
+                        <button type="button" class="btn-toggle-pass" aria-label="Mostrar/ocultar" onclick="togglePass('cfg-confirm', this)">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="msg-config-pass" class="result-alert hidden"></div>
+
+                <button type="submit" id="btn-config-pass" class="btn-primary btn-with-spinner" style="width:100%; padding:11px; margin-top: 4px;">
+                    <div class="spinner"></div>
+                    <span class="btn-label">Actualizar contraseña de configuración</span>
+                </button>
+            </form>
+        </div>
+
+    </div>
+</main>
+
+<!-- ═══════════════════════ MODAL DE CONFIRMACIÓN RESPALDO ═════════════════ -->
+<div class="modal-overlay" id="modalConfirmRespaldo" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div class="modal-icon">⚠️</div>
+            <h3 class="modal-title" id="modalTitulo">Confirmar creación de respaldo</h3>
+        </div>
+        <div class="modal-body">
+            Esto reemplazará el respaldo anterior. ¿Deseas continuar?
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="btn-modal-cancel" id="btnModalCancelar">Cancelar</button>
+            <button type="button" class="btn-modal-confirm" id="btnModalAceptar">Sí, crear respaldo</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════ MODAL DE CONFIRMACIÓN RESTAURACIÓN ══════════════ -->
+<div class="modal-overlay" id="modalConfirmRestaurar" role="dialog" aria-modal="true" aria-labelledby="modalRestaurarTitulo">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div class="modal-icon" style="background: var(--danger-bg); color: var(--danger);">⚠️</div>
+            <h3 class="modal-title" id="modalRestaurarTitulo">Confirmar restauración</h3>
+        </div>
+        <div class="modal-body" id="modalRestaurarBody">
+            Esta acción reemplazará la base de datos actual con la información del respaldo seleccionado.
+            <br><br>
+            <strong>Copia de seguridad preventiva:</strong> Antes de aplicar el respaldo, el sistema crea un respaldo automático de los datos actuales por si ocurre algún inconveniente.
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="btn-modal-cancel" id="btnModalRestaurarCancelar">Cancelar</button>
+            <button type="button" class="btn-modal-confirm" id="btnModalRestaurarAceptar" style="background: var(--danger);">Sí, restaurar datos</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════ SCRIPTS ══════════════════════════════════════ -->
+<script>
+/* ──────────────────────────────────────────────────────────────────────────
+   Formato de bytes para tamaño legible
+────────────────────────────────────────────────────────────────────────── */
+function formatearBytes(bytes) {
+    if (!bytes || bytes <= 0) return '0 B';
+    const unidades = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + unidades[i];
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Consultar estado del último respaldo
+────────────────────────────────────────────────────────────────────────── */
+async function cargarEstadoRespaldo() {
+    const badge       = document.getElementById('badgeRespaldo');
+    const badgeTexto  = document.getElementById('badgeTexto');
+    const txtInfo     = document.getElementById('txtRespaldoInfo');
+    const txtSub      = document.getElementById('txtRespaldoSub');
+    const btnDescarga = document.getElementById('btnDescargarRespaldo');
+
+    try {
+        const res = await fetch('/backend/estado_respaldo.php');
+        if (res.status === 401) {
+            window.location.href = '/public/html/access_config.html';
+            return;
+        }
+        const data = await res.json();
+
+        if (data.existe) {
+            badge.className = 'status-badge available';
+            badgeTexto.textContent = 'Disponible';
+            txtInfo.textContent = 'Último respaldo: ' + data.fecha;
+            txtSub.textContent = 'Tamaño del archivo: ' + formatearBytes(data.tamano);
+            btnDescarga.style.display = 'inline-flex';
+        } else {
+            badge.className = 'status-badge empty';
+            badgeTexto.textContent = 'Sin archivo';
+            txtInfo.textContent = 'Aún no hay respaldo';
+            txtSub.textContent = 'Presiona "Crear respaldo" para generar una copia ahora.';
+            btnDescarga.style.display = 'none';
+        }
+    } catch (err) {
+        console.warn('Error al consultar estado de respaldo:', err);
+        txtInfo.textContent = 'No se pudo verificar el estado';
+        txtSub.textContent = 'Intenta recargar la página.';
+    }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Modal de Confirmación y Creación de Respaldo
+────────────────────────────────────────────────────────────────────────── */
+const modalConfirm   = document.getElementById('modalConfirmRespaldo');
+const btnCrear       = document.getElementById('btnCrearRespaldo');
+const btnModalCancel = document.getElementById('btnModalCancelar');
+const btnModalOk     = document.getElementById('btnModalAceptar');
+
+function abrirModal() {
+    modalConfirm.classList.add('active');
+    btnModalOk.focus();
+}
+
+function cerrarModal() {
+    modalConfirm.classList.remove('active');
+}
+
+btnCrear.addEventListener('click', abrirModal);
+btnModalCancel.addEventListener('click', cerrarModal);
+
+modalConfirm.addEventListener('click', (e) => {
+    if (e.target === modalConfirm) cerrarModal();
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modalConfirm.classList.contains('active')) {
+        cerrarModal();
+    }
+});
+
+btnModalOk.addEventListener('click', async () => {
+    cerrarModal();
+    ocultarMensaje('msg-respaldo');
+
+    btnCrear.classList.add('loading');
+    btnCrear.disabled = true;
+
+    try {
+        const res = await fetch('/backend/crear_respaldo.php', { method: 'POST' });
+        if (res.status === 401) {
+            alert('Sesión de configuración no autorizada o expirada. Redirigiendo...');
+            window.location.href = '/public/html/access_config.html';
+            return;
+        }
+
+        const data = await res.json();
+        btnCrear.classList.remove('loading');
+        btnCrear.disabled = false;
+
+        if (data.exito) {
+            mostrarMensaje('msg-respaldo', 'success', 'Respaldo generado con éxito.');
+            cargarEstadoRespaldo();
+        } else {
+            mostrarMensaje('msg-respaldo', 'error', data.mensaje || 'No se pudo crear el respaldo.');
+        }
+    } catch (err) {
+        btnCrear.classList.remove('loading');
+        btnCrear.disabled = false;
+        mostrarMensaje('msg-respaldo', 'error', 'No se pudo crear el respaldo. Error de comunicación.');
+        console.error(err);
+    }
+});
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Mostrar / ocultar contraseña
+────────────────────────────────────────────────────────────────────────── */
+function togglePass(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const isPass = input.type === 'password';
+    input.type = isPass ? 'text' : 'password';
+
+    btn.innerHTML = isPass
+        ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+               <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8 a18.45 18.45 0 0 1 5.06-5.94"></path>
+               <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8 a18.5 18.5 0 0 1-2.16 3.19"></path>
+               <line x1="1" y1="1" x2="23" y2="23"></line>
+           </svg>`
+        : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+               <circle cx="12" cy="12" r="3"></circle>
+           </svg>`;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Barra de fortaleza de contraseña
+────────────────────────────────────────────────────────────────────────── */
+function evaluarFortaleza(input, barId, labelId) {
+    const val   = input.value;
+    const bar   = document.getElementById(barId);
+    const label = document.getElementById(labelId);
+
+    let puntos = 0;
+    if (val.length >= 6)  puntos++;
+    if (val.length >= 8)  puntos++;
+    if (/[A-Z]/.test(val)) puntos++;
+    if (/[0-9]/.test(val)) puntos++;
+    if (/[^A-Za-z0-9]/.test(val)) puntos++;
+
+    const niveles = [
+        { pct: '0%',   color: '',          txt: '' },
+        { pct: '25%',  color: '#ef4444',   txt: 'Muy débil' },
+        { pct: '45%',  color: '#f59e0b',   txt: 'Débil' },
+        { pct: '65%',  color: '#eab308',   txt: 'Regular' },
+        { pct: '82%',  color: '#22c55e',   txt: 'Buena' },
+        { pct: '100%', color: '#10b981',   txt: 'Muy segura' },
+    ];
+
+    const nivel = val.length === 0 ? niveles[0] : niveles[Math.min(puntos, 5)];
+    bar.style.width           = nivel.pct;
+    bar.style.backgroundColor = nivel.color;
+    label.textContent         = nivel.txt;
+    label.style.color         = nivel.color;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Mostrar y ocultar alertas
+────────────────────────────────────────────────────────────────────────── */
+function mostrarMensaje(id, tipo, texto) {
+    const el = document.getElementById(id);
+    el.className = 'result-alert ' + tipo;
+    el.innerHTML = (tipo === 'success' ? '✅ ' : '❌ ') + texto;
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function ocultarMensaje(id) {
+    const el = document.getElementById(id);
+    el.className = 'result-alert hidden';
+    el.textContent = '';
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Envío de formularios de contraseñas
+────────────────────────────────────────────────────────────────────────── */
+function configurarFormularioPass(formId, btnId, msgId) {
+    const form = document.getElementById(formId);
+    const btn  = document.getElementById(btnId);
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        ocultarMensaje(msgId);
+
+        const data    = new FormData(form);
+        const actual  = data.get('pass_actual');
+        const nueva   = data.get('pass_nueva');
+        const confirm = data.get('pass_confirmacion');
+
+        if (!actual || actual.trim() === '') {
+            mostrarMensaje(msgId, 'error', 'Ingresa la contraseña actual.');
+            return;
+        }
+        if (!nueva || nueva.length < 6) {
+            mostrarMensaje(msgId, 'error', 'La nueva contraseña debe tener al menos 6 caracteres.');
+            return;
+        }
+        if (nueva !== confirm) {
+            mostrarMensaje(msgId, 'error', 'La confirmación no coincide con la nueva contraseña.');
+            return;
+        }
+
+        btn.classList.add('loading');
+        btn.disabled = true;
+
+        fetch('/backend/cambiar_contrasena.php', {
+            method: 'POST',
+            body: data
+        })
+        .then(res => {
+            if (res.status === 401) {
+                alert('Sesión de configuración no autorizada o expirada. Redirigiendo...');
+                window.location.href = '/public/html/access_config.html';
+                return null;
+            }
+            return res.json();
+        })
+        .then(resp => {
+            if (!resp) return;
+            btn.classList.remove('loading');
+            btn.disabled = false;
+
+            if (resp.exito) {
+                mostrarMensaje(msgId, 'success', resp.mensaje);
+                form.reset();
+                form.querySelectorAll('.strength-bar-fill').forEach(b => b.style.width = '0%');
+                form.querySelectorAll('.strength-label').forEach(l => l.textContent = '');
+            } else {
+                mostrarMensaje(msgId, 'error', resp.mensaje);
+            }
+        })
+        .catch(err => {
+            btn.classList.remove('loading');
+            btn.disabled = false;
+            mostrarMensaje(msgId, 'error', 'Error de conexión con el servidor.');
+            console.error(err);
+        });
+    });
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Copia Automática Externa (USB / Nube)
+────────────────────────────────────────────────────────────────────────── */
+async function cargarConfiguracionCopiaExterna() {
+    const chk     = document.getElementById('chkCopiaExterna');
+    const txtRuta = document.getElementById('txtRutaExterna');
+    const badge   = document.getElementById('badgeCopiaExterna');
+    const badgeTx = document.getElementById('txtBadgeCopia');
+    const txtInfo = document.getElementById('txtCopiaExternaInfo');
+    const txtSub  = document.getElementById('txtCopiaExternaSub');
+
+    try {
+        const res = await fetch('/backend/guardar_copia_destino.php');
+        if (res.status === 401) return;
+        const data = await res.json();
+        if (!data.exito) return;
+
+        const cfg = data.configuracion || {};
+        chk.checked = !!cfg.habilitada;
+        txtRuta.value = cfg.ruta_destino || '';
+
+        if (!cfg.habilitada) {
+            badge.className = 'status-badge empty';
+            badgeTx.textContent = 'Desactivada';
+            txtInfo.textContent = 'Copia externa inactiva';
+            txtSub.textContent = 'Actívala e indica una ruta de USB o nube.';
+        } else if (data.accesible) {
+            badge.className = 'status-badge available';
+            badgeTx.textContent = 'Conectada y lista';
+            txtInfo.textContent = 'Ruta accesible: ' + cfg.ruta_destino;
+            txtSub.textContent = cfg.ultimo_exito 
+                ? 'Última copia realizada: ' + cfg.ultimo_exito 
+                : 'Se copiará automáticamente en el próximo respaldo.';
+        } else {
+            badge.className = 'status-badge empty';
+            badgeTx.textContent = 'No disponible';
+            txtInfo.textContent = 'Unidad o carpeta no encontrada';
+            txtSub.textContent = 'Verifica que la memoria USB esté conectada al equipo.';
+        }
+    } catch (e) {
+        console.warn('Error consultando copia externa:', e);
+    }
+}
+
+function configurarFormularioCopiaExterna() {
+    const form = document.getElementById('form-copia-externa');
+    const btn  = document.getElementById('btnGuardarCopiaExterna');
+    const msgId = 'msg-copia-externa';
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        ocultarMensaje(msgId);
+
+        btn.classList.add('loading');
+        btn.disabled = true;
+
+        const fd = new FormData(form);
+        if (!document.getElementById('chkCopiaExterna').checked) {
+            fd.set('habilitada', '0');
+        }
+
+        try {
+            const res = await fetch('/backend/guardar_copia_destino.php', {
+                method: 'POST',
+                body: fd
+            });
+            if (res.status === 401) {
+                alert('Sesión no autorizada o expirada.');
+                window.location.href = '/public/html/access_config.html';
+                return;
+            }
+            const data = await res.json();
+            btn.classList.remove('loading');
+            btn.disabled = false;
+
+            if (data.exito) {
+                mostrarMensaje(msgId, 'success', data.mensaje);
+                cargarConfiguracionCopiaExterna();
+            } else {
+                mostrarMensaje(msgId, 'error', data.mensaje || 'No se pudo guardar la configuración.');
+            }
+        } catch (err) {
+            btn.classList.remove('loading');
+            btn.disabled = false;
+            mostrarMensaje(msgId, 'error', 'Error al comunicarse con el servidor.');
+        }
+    });
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Restauración de Base de Datos (Último respaldo o Archivo SQL)
+────────────────────────────────────────────────────────────────────────── */
+let estadoRestauracion = { origen: 'ultimo', archivo: null };
+
+function configurarRestauracion() {
+    const modalRestaurar       = document.getElementById('modalConfirmRestaurar');
+    const modalRestaurarBody   = document.getElementById('modalRestaurarBody');
+    const btnRestaurarUltimo   = document.getElementById('btnRestaurarUltimo');
+    const btnSeleccionarSql    = document.getElementById('btnSeleccionarArchivoSql');
+    const inputSql             = document.getElementById('inputArchivoSql');
+    const txtArchivoSelec      = document.getElementById('txtArchivoSeleccionado');
+    const btnModalCancel       = document.getElementById('btnModalRestaurarCancelar');
+    const btnModalOk           = document.getElementById('btnModalRestaurarAceptar');
+    const msgId                = 'msg-restaurar';
+
+    function abrirModalRestaurar(origen, nombreArchivo = '') {
+        estadoRestauracion.origen = origen;
+        ocultarMensaje(msgId);
+
+        if (origen === 'ultimo') {
+            modalRestaurarBody.innerHTML = '¿Deseas restaurar la base de datos al <strong>último respaldo guardado</strong> en este equipo?<br><br>Se reemplazarán los registros actuales. Se generará un respaldo preventivo de seguridad antes de proceder.';
+        } else {
+            modalRestaurarBody.innerHTML = '¿Deseas restaurar la base de datos desde el archivo <strong>' + esc(nombreArchivo) + '</strong>?<br><br>Se reemplazarán los registros actuales. Se generará un respaldo preventivo de seguridad antes de proceder.';
+        }
+        modalRestaurar.classList.add('active');
+        btnModalOk.focus();
+    }
+
+    function cerrarModalRestaurar() {
+        modalRestaurar.classList.remove('active');
+    }
+
+    btnRestaurarUltimo.addEventListener('click', () => {
+        abrirModalRestaurar('ultimo');
+    });
+
+    btnSeleccionarSql.addEventListener('click', () => {
+        inputSql.value = '';
+        inputSql.click();
+    });
+
+    inputSql.addEventListener('change', () => {
+        if (inputSql.files && inputSql.files[0]) {
+            const file = inputSql.files[0];
+            estadoRestauracion.archivo = file;
+            txtArchivoSelec.textContent = 'Archivo listo: ' + file.name + ' (' + formatearBytes(file.size) + ')';
+            abrirModalRestaurar('archivo', file.name);
+        }
+    });
+
+    btnModalCancel.addEventListener('click', cerrarModalRestaurar);
+    modalRestaurar.addEventListener('click', (e) => {
+        if (e.target === modalRestaurar) cerrarModalRestaurar();
+    });
+
+    btnModalOk.addEventListener('click', async () => {
+        cerrarModalRestaurar();
+        ocultarMensaje(msgId);
+
+        btnRestaurarUltimo.classList.add('loading');
+        btnRestaurarUltimo.disabled = true;
+
+        const fd = new FormData();
+        fd.append('origen', estadoRestauracion.origen);
+        if (estadoRestauracion.origen === 'archivo' && estadoRestauracion.archivo) {
+            fd.append('archivo_sql', estadoRestauracion.archivo);
+        }
+
+        try {
+            const res = await fetch('/backend/restaurar_respaldo.php', {
+                method: 'POST',
+                body: fd
+            });
+
+            btnRestaurarUltimo.classList.remove('loading');
+            btnRestaurarUltimo.disabled = false;
+
+            if (res.status === 401) {
+                alert('Sesión no autorizada o expirada.');
+                window.location.href = '/public/html/access_config.html';
+                return;
+            }
+
+            const data = await res.json();
+            if (data.exito) {
+                mostrarMensaje(
+                    msgId,
+                    'success',
+                    data.mensaje + ' Registros restaurados: ' + (data.empleados ?? 0) + ' empleados, ' + (data.evaluaciones ?? 0) + ' evaluaciones.'
+                );
+                cargarEstadoRespaldo();
+            } else {
+                mostrarMensaje(msgId, 'error', data.mensaje || 'Error al restaurar el respaldo.');
+            }
+        } catch (err) {
+            btnRestaurarUltimo.classList.remove('loading');
+            btnRestaurarUltimo.disabled = false;
+            mostrarMensaje(msgId, 'error', 'Error al comunicarse con el servidor durante la restauración.');
+            console.error(err);
+        }
+    });
+}
+
+function esc(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Verificación de autorización de acceso a configuraciones
+────────────────────────────────────────────────────────────────────────── */
+async function verificarAccesoConfig() {
+    try {
+        const res = await fetch('/backend/auth_check.php');
+        const data = await res.json();
+        if (!data.autenticado || !data.config_autenticado) {
+            window.location.href = '/public/html/access_config.html';
+            return;
+        }
+
+        // Mostrar advertencia si existen contraseñas de fábrica
+        if (data.claves_fabrica && data.claves_fabrica.alerta) {
+            const banner = document.getElementById('banner-alerta-claves');
+            const txt    = document.getElementById('txtAlertaClaves');
+            if (banner && txt) {
+                const avisos = [];
+                if (data.claves_fabrica.admin) avisos.push('contraseña de acceso general ("ana2")');
+                if (data.claves_fabrica.config) avisos.push('contraseña de configuraciones ("ana3")');
+                txt.textContent = 'El sistema tiene activa(s) la(s) ' + avisos.join(' y ') + '. Te recomendamos cambiarlas inmediatamente para proteger tus datos.';
+                banner.style.display = 'flex';
+            }
+        }
+    } catch (err) {
+        console.warn('Error verificando sesión de configuración:', err);
+    }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Inicialización de la página
+────────────────────────────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+    verificarAccesoConfig();
+    cargarEstadoRespaldo();
+    cargarConfiguracionCopiaExterna();
+    configurarFormularioCopiaExterna();
+    configurarRestauracion();
+    configurarFormularioPass('form-acceso', 'btn-acceso', 'msg-acceso');
+    configurarFormularioPass('form-config-pass', 'btn-config-pass', 'msg-config-pass');
+});
+</script>
+</body>
+</html>

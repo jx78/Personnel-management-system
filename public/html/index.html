@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/css/style.css">
+    <title>Registro de Empleados - Sistema de Evaluación</title>
+</head>
+<body>
+    <!-- Barra de navegación uniforme -->
+    <header class="navbar">
+        <div class="navbar-inner">
+            <div class="navbar-brand">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                <span>Gestión de Personal</span>
+                <span class="navbar-brand-badge">Sistema</span>
+            </div>
+            <!-- Barra de navegación con enlaces pre-renderizados -->
+            <nav id="links" class="links">
+                <a class="nav-link active" href="/public/html/index.html">
+                    <span>📝</span> Registro
+                </a>
+                <a class="nav-link" href="/public/html/en evaluacion.html">
+                    <span>⏳</span> En Evaluación
+                </a>
+                <a class="nav-link" href="/public/html/Finalizados.html">
+                    <span>✅</span> Finalizados
+                </a>
+                <a class="nav-link" href="/public/html/No Finalizados.html">
+                    <span>⛔</span> No Finalizados
+                </a>
+                <a class="nav-link btn-logout" id="navBtnLogout" href="javascript:void(0)">
+                    <span>🚪</span> Cerrar Sesión
+                </a>
+                <a class="nav-link nav-link-icon" id="navBtnConfig" href="/public/html/access_config.html" title="Configuraciones del Sistema" aria-label="Configuraciones del Sistema">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page-container">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">📝 Registro de Empleados</h1>
+                <p class="page-subtitle">Captura de información para el período de prueba y evaluaciones periódicas.</p>
+            </div>
+        </div>
+
+        <!-- Zona para mensajes de respuesta del servidor -->
+        <div id="mensaje-estado" class="alert-box"></div>
+
+        <div class="form-card">
+            <form action="/backend/ingreso.php" method="POST" id="infopersona" novalidate>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nombre">Nombre(s) *</label>
+                        <input type="text" id="nombre" name="nombre" placeholder="Ej. Juan Carlos" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="apellido">Apellidos *</label>
+                        <input type="text" id="apellido" name="apellido" placeholder="Ej. Pérez Morales" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edad">Edad (años) *</label>
+                        <input type="number" id="edad" name="edad" min="15" max="99" placeholder="Ej. 28" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nivelacademico">Nivel Académico *</label>
+                        <input type="text" id="nivelacademico" name="nivelacademico" placeholder="Ej. Preparatoria / Licenciatura" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="demografia">Demografía / Ubicación *</label>
+                        <input type="text" id="demografia" name="demografia" placeholder="Ej. CEDIS TEPIC / PLANTA TEPIC" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="puesto">Puesto *</label>
+                        <input type="text" name="puesto" id="puesto" placeholder="Ej. Chofer Repartidor" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Codigoempleado">Código de Empleado (Alfanumérico, máx. 20 car.) *</label>
+                        <input type="text" name="Codigoempleado" id="Codigoempleado" maxlength="20" placeholder="Ej. 00123 o EMP-101" required>
+                        <small style="color: var(--text-muted); font-size: 0.75rem; display: block; margin-top: 3px;">Conserva ceros iniciales (ej. 00123). Máximo 20 caracteres.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="supervisor">Supervisor / Jefe Inmediato *</label>
+                        <input type="text" id="supervisor" name="supervisor" placeholder="Ej. Roberto Gómez Cruz" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fecha">Fecha de Ingreso *</label>
+                        <input type="date" id="fecha" name="fecha" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="termino">Término de Contrato * <small style="color:var(--text-muted);">(+89 días auto)</small></label>
+                        <input type="date" id="termino" name="termino" required>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 24px;">
+                    <label for="observaciones">Observaciones (Opcional)</label>
+                    <textarea id="observaciones" name="observaciones" rows="3" placeholder="Anotaciones iniciales relevantes..."></textarea>
+                </div>
+
+                <div class="btn-container">
+                    <button type="button" id="btnLimpiar" class="btn-secondary">Limpiar Formulario</button>
+                    <button type="submit" id="dataverification" class="btn-primary">Continuar y Verificar</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Modal para confirmación de datos antes de guardar (Estructura corregida fuera de form) -->
+    <div id="modalDatos" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirmar Datos del Empleado</h3>
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px; text-align: center;">
+                Verifica que la información capturada sea correcta antes de registrar en el sistema.
+            </p>
+            <div id="contenidoDatos" class="modal-body-text"></div>
+            <div class="modal-actions">
+                <button type="button" id="btnCancelar" class="btn-secondary">Modificar</button>
+                <button type="button" id="btnConfirmar" class="btn-primary">Confirmar y Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts centralizados -->
+    <script src="/public/js/script.js"></script>
+    <script>
+    // Cálculo automático de término de contrato al seleccionar fecha de entrada (fecha + 89 días)
+    document.getElementById('fecha').addEventListener('change', function() {
+        if (!this.value) return;
+        const d = new Date(this.value + 'T00:00:00Z');
+        d.setUTCDate(d.getUTCDate() + 89);
+        document.getElementById('termino').value = d.toISOString().slice(0, 10);
+    });
+
+    // Botón Continuar: valida campos obligatorios y muestra modal de confirmación
+    document.getElementById('dataverification').addEventListener('click', function(event) {
+        event.preventDefault(); 
+
+        const nombre = document.getElementById('nombre').value.trim();
+        const apellido = document.getElementById('apellido').value.trim();
+        const edad = document.getElementById('edad').value.trim();
+        const nivelacademico = document.getElementById('nivelacademico').value.trim();
+        const demografia = document.getElementById('demografia').value.trim();
+        const puesto = document.getElementById('puesto').value.trim();
+        const codigoEmpleado = document.getElementById('Codigoempleado').value.trim();
+        const supervisor = document.getElementById('supervisor').value.trim();
+        const fecha = document.getElementById('fecha').value;
+        const termino = document.getElementById('termino').value;
+        const observaciones = document.getElementById('observaciones').value.trim();
+
+        if (!nombre || !apellido || !edad || !supervisor || !fecha || !termino || !puesto || !nivelacademico || !demografia || !codigoEmpleado) {
+            alert('Por favor completa todos los campos obligatorios marcados con (*).');
+            return;
+        }
+
+        const mensaje = 
+            `• Nombre: ${nombre} ${apellido}\n` +
+            `• Código de Empleado: ${codigoEmpleado}\n` +
+            `• Puesto: ${puesto}\n` +
+            `• Edad: ${edad} años\n` +
+            `• Demografía / Planta: ${demografia}\n` +
+            `• Nivel Académico: ${nivelacademico}\n` +
+            `• Supervisor Inmediato: ${supervisor}\n` +
+            `• Fecha de Ingreso: ${fecha}\n` +
+            `• Término de Contrato: ${termino}\n` +
+            `• Observaciones: ${observaciones || 'Ninguna'}`;
+
+        document.getElementById('contenidoDatos').textContent = mensaje;
+        document.getElementById('modalDatos').style.display = 'flex';
+    });
+
+    // Botón Limpiar: vacía el formulario
+    document.getElementById('btnLimpiar').addEventListener('click', function() {
+        if (confirm('¿Deseas vaciar todos los campos del formulario?')) {
+            document.getElementById('infopersona').reset();
+        }
+    });
+
+    // Botón Cancelar modal: cierra sin guardar
+    document.getElementById('btnCancelar').addEventListener('click', function() {
+        document.getElementById('modalDatos').style.display = 'none';
+    });
+
+    // Botón Confirmar: envía petición AJAX a backend/ingreso.php
+    document.getElementById('btnConfirmar').addEventListener('click', function() {
+        const form = document.getElementById('infopersona');
+        const formData = new FormData(form);
+        const mensajeEstado = document.getElementById('mensaje-estado');
+
+        this.disabled = true;
+        this.textContent = 'Guardando...';
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.status === 401) {
+                alert('Sesión no autorizada o expirada. Redirigiendo al inicio de sesión...');
+                window.location.href = '/public/html/access.html';
+                return null;
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (!data) return;
+            document.getElementById('modalDatos').style.display = 'none';
+            document.getElementById('btnConfirmar').disabled = false;
+            document.getElementById('btnConfirmar').textContent = 'Confirmar y Guardar';
+
+            mensajeEstado.style.display = 'block';
+            if (data.exito) {
+                mensajeEstado.className = 'alert-box success';
+                mensajeEstado.textContent = '✓ ' + data.mensaje;
+                form.reset();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                mensajeEstado.className = 'alert-box error';
+                mensajeEstado.textContent = '✕ ' + data.mensaje;
+            }
+        })
+        .catch(error => {
+            document.getElementById('modalDatos').style.display = 'none';
+            document.getElementById('btnConfirmar').disabled = false;
+            document.getElementById('btnConfirmar').textContent = 'Confirmar y Guardar';
+
+            mensajeEstado.style.display = 'block';
+            mensajeEstado.className = 'alert-box error';
+            mensajeEstado.textContent = '✕ Error de conexión con el servidor.';
+            console.error('Error:', error);
+        });
+    });
+    </script>
+</body>
+</html>

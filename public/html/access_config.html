@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/css/style.css">
+    <title>Acceso a Configuraciones - Sistema de Gestión</title>
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            <div class="auth-icon" style="background: rgba(37, 99, 235, 0.1); color: var(--primary);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+            </div>
+            <h1 class="auth-title">Panel de Configuraciones</h1>
+            <p class="auth-subtitle">Ingresa la clave de acceso a configuraciones para continuar</p>
+
+            <div id="mensajeAlerta" class="alert-box" style="display: none;"></div>
+
+            <form id="formAccesoConfig" class="formAcceso" method="POST" action="/backend/login_config.php">
+                <div class="form-group password-container" style="margin-bottom: 20px;">
+                    <label for="Password">Contraseña de Configuración</label>
+                    <input type="password" id="Password" name="Password" placeholder="••••••" autocomplete="current-password" required autofocus>
+                </div>
+
+                <button type="submit" class="btn-primary" style="width: 100%; padding: 12px; margin-bottom: 12px;">
+                    Entrar a Configuraciones
+                </button>
+
+                <div style="text-align: center; margin-top: 14px;">
+                    <a href="/public/html/index.html" style="color: var(--text-secondary); font-size: 0.875rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 500;">
+                        <span>⬅️</span> Volver a los Registros
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/public/js/access_config.js"></script>
+</body>
+</html>
