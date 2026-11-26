@@ -103,6 +103,19 @@ if (in_array(rtrim($pathLow, '/'), $blockedRoots, true)) {
 $docRoot  = $_SERVER['DOCUMENT_ROOT'];
 $filePath = $docRoot . $path;
 
+if (is_dir($filePath)) {
+    if (is_file(rtrim($filePath, '/\\') . '/index.php')) {
+        $filePath = rtrim($filePath, '/\\') . '/index.php';
+        $ext = 'php';
+    } elseif (is_file(rtrim($filePath, '/\\') . '/index.html')) {
+        $filePath = rtrim($filePath, '/\\') . '/index.html';
+        $ext = 'html';
+    } elseif (is_file(rtrim($filePath, '/\\') . '/public/index.html')) {
+        $filePath = rtrim($filePath, '/\\') . '/public/index.html';
+        $ext = 'html';
+    }
+}
+
 if (is_file($filePath) && $ext !== 'php') {
     return false;
 }
